@@ -1,0 +1,21 @@
+cases:
+  - name: finance demo
+    input:
+      dtype: float32
+      symbol: AAPL
+      period: 7d
+      interval: 1h
+    system:
+      input_buffer:
+        step_size: 10
+        buffer_size: 50
+        channel_shape: [1]
+        dtype: float32
+      features:
+        window_size: 20
+      predictor:
+        input_dim: 6
+        hidden_dim: 32
+        output_dim: 1
+        num_layers: 2
+    poll_interval: 60

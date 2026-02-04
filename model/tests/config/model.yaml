@@ -1,0 +1,6 @@
+cases:
+  - name: lstm model
+    input_dim: 6
+    hidden_dim: 32
+    output_dim: 1
+    num_layers: 2

@@ -1,0 +1,35 @@
+[project]
+name = "data-processing"
+version = "0.1.0"
+description = "Data processing framework with finance demo"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "activator",
+    "system",
+    "buffer",
+    "parametrize-tests",
+    "data-fetcher",
+    "feature-extraction",
+    "model",
+    "finance-demo",
+    "stock-analyzer",
+]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.1.0",
+    "pytest>=8.3.4",
+    "pytest-xdist>=3.6.1",
+]
+
+[tool.uv.sources]
+activator = { path = "../signal-processing/activator", editable = true }
+system = { path = "../signal-processing/system", editable = true }
+buffer = { path = "../signal-processing/buffer", editable = true }
+parametrize-tests = { path = "../signal-processing/parametrize-tests", editable = true }
+data-fetcher = { path = "data-fetcher", editable = true }
+feature-extraction = { path = "feature-extraction", editable = true }
+model = { path = "model", editable = true }
+finance-demo = { path = "finance-demo", editable = true }
+stock-analyzer = { path = "stock-analyzer", editable = true }

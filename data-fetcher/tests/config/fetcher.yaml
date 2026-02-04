@@ -1,0 +1,5 @@
+cases:
+  - name: fetch historical data
+    symbol: AAPL
+    period: 7d
+    interval: 1h

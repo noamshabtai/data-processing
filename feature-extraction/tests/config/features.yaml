@@ -1,0 +1,4 @@
+cases:
+  - name: trend extraction
+    window_size: 20
+    input_size: 100
