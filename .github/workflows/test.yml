@@ -11,6 +11,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - uses: actions/checkout@v4
+      with:
+        repository: noamshabtai/signal-processing
+        path: ../signal-processing
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
