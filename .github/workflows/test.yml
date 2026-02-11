@@ -11,6 +11,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Checkout signal-processing
+      run: git clone https://github.com/noamshabtai/signal-processing.git ../signal-processing
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
