@@ -52,9 +52,64 @@ stock-analyzer -> finance-demo -> feature-extraction (numpy, scipy)
                                -> signal-processing (activator, system, buffer)
 ```
 
+## Data Flow Pipeline
+
+```
+AAPL price tick (yfinance Fetcher)
+    │
+    ▼
+Input Buffer (sliding window, e.g. last 50 points)
+    │
+    ▼
+Pipeline (feature-extraction)
+  ├── TrendExtractor → [moving_avg, slope, slope_std]
+  └── FFTExtractor   → [dom_freq, dom_mag, mean_mag]
+    │
+    ▼
+Feature vector: 6 values (this is why input_dim=6 in configs)
+    │
+    ▼
+LSTM (2 layers, hidden_dim=32) → Linear(32→1) → prediction
+```
+
+The `System.connect()` method in `finance-demo` defines data routing using `match`/`case`:
+- buffer output → `Pipeline.extract()`
+- pipeline output → `Predictor.predict()`
+
+## Key Classes & Locations
+
+| Class | Module | Path |
+|---|---|---|
+| `Fetcher` | data-fetcher | `data-fetcher/src/data_fetcher/fetcher.py` |
+| `TrendExtractor` | feature-extraction | `feature-extraction/src/feature_extraction/trend.py` |
+| `FFTExtractor` | feature-extraction | `feature-extraction/src/feature_extraction/fft.py` |
+| `Pipeline` | feature-extraction | `feature-extraction/src/feature_extraction/pipeline.py` |
+| `LSTM` | model | `model/src/model/lstm.py` |
+| `Predictor` | model | `model/src/model/predictor.py` |
+| `System` | finance-demo | `finance-demo/src/finance_demo/system.py` |
+
+## Model Architecture
+
+2-layer LSTM → single Linear output layer. No hidden fully-connected layers.
+
+```
+LSTM(input_dim=6, hidden_dim=32, num_layers=2) → Linear(32→1) → prediction
+```
+
+## CLI Usage
+
+```bash
+stock-analyzer train --symbol AAPL --period 1y --epochs 10 --output model.pt
+stock-analyzer predict --symbol AAPL --model model.pt
+```
+
 ## Key Patterns
 
 - Each module uses `src/` layout with hatchling build backend
 - Test configs live in `tests/config/*.yaml`
 - `conftest.py` registers YAML-based parametrized fixtures via `parametrize_tests.fixtures.setattr_kwargs`
 - Deep copy of kwargs in tests ensures isolation between parametrized cases
+
+## Educational Resources
+
+- [`docs/lstm-walkthrough.md`](docs/lstm-walkthrough.md) — Deep dive into the project pipeline, LSTM internals, and PyTorch concepts
