@@ -12,8 +12,8 @@ def test_fetcher_fetch_historical_returns_dataframe(mocker, kwargs_fetcher):
     kwargs = copy.deepcopy(kwargs_fetcher)
     mock_ticker = mocker.patch("yfinance.Ticker")
     mock_ticker.return_value.history.return_value = MOCK_HISTORICAL_DF
-    fetcher = data_fetcher.fetcher.Fetcher(**kwargs)
-    df = fetcher.fetch_historical()
+    tested = data_fetcher.fetcher.Fetcher(**kwargs)
+    df = tested.fetch_historical()
     assert isinstance(df, pd.DataFrame)
 
 
@@ -21,8 +21,8 @@ def test_fetcher_fetch_historical_has_ohlcv_columns(mocker, kwargs_fetcher):
     kwargs = copy.deepcopy(kwargs_fetcher)
     mock_ticker = mocker.patch("yfinance.Ticker")
     mock_ticker.return_value.history.return_value = MOCK_HISTORICAL_DF
-    fetcher = data_fetcher.fetcher.Fetcher(**kwargs)
-    df = fetcher.fetch_historical()
+    tested = data_fetcher.fetcher.Fetcher(**kwargs)
+    df = tested.fetch_historical()
     expected_columns = ["Open", "High", "Low", "Close", "Volume"]
     for col in expected_columns:
         assert col in df.columns
@@ -32,6 +32,6 @@ def test_fetcher_fetch_latest_returns_series(mocker, kwargs_fetcher):
     kwargs = copy.deepcopy(kwargs_fetcher)
     mock_ticker = mocker.patch("yfinance.Ticker")
     mock_ticker.return_value.history.return_value = MOCK_HISTORICAL_DF
-    fetcher = data_fetcher.fetcher.Fetcher(**kwargs)
-    latest = fetcher.fetch_latest()
+    tested = data_fetcher.fetcher.Fetcher(**kwargs)
+    latest = tested.fetch_latest()
     assert isinstance(latest, pd.Series)
