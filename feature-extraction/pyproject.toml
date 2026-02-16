@@ -13,3 +13,12 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/feature_extraction"]
+
+[tool.uv.sources]
+parametrize-tests = { path = "../../signal-processing/parametrize-tests", editable = true }
+
+[dependency-groups]
+dev = [
+    "parametrize-tests",
+    "pytest>=9.0.2",
+]

@@ -1,31 +1,58 @@
 import copy
 
-import feature_extraction.fft
-import feature_extraction.pipeline
-import feature_extraction.trend
+import feature_extraction.feature_extraction
 import numpy as np
+import pytest
 
 
-def test_trend_extractor_output_shape(kwargs_features):
+def build_signal(simulation):
+    match simulation["type"]:
+        case "constant":
+            return np.full(simulation["size"], simulation["value"])
+        case "linear":
+            return np.linspace(simulation["start"], simulation["stop"], simulation["size"])
+        case "sine":
+            return np.sin(2 * np.pi * simulation["cycles"] * np.arange(simulation["size"]) / simulation["size"])
+
+
+def test_feature_extraction_output_shape(kwargs_features):
     kwargs = copy.deepcopy(kwargs_features)
-    extractor = feature_extraction.trend.TrendExtractor(**kwargs)
-    data = np.random.randn(kwargs["input_size"])
-    result = extractor.extract(data)
-    assert result.shape[0] > 0
-
-
-def test_fft_extractor_output_shape(kwargs_features):
-    kwargs = copy.deepcopy(kwargs_features)
-    extractor = feature_extraction.fft.FFTExtractor(**kwargs)
-    data = np.random.randn(kwargs["input_size"])
-    result = extractor.extract(data)
-    assert result.shape[0] > 0
-
-
-def test_pipeline_concatenates_all_features(kwargs_features):
-    kwargs = copy.deepcopy(kwargs_features)
-    pipeline = feature_extraction.pipeline.Pipeline(**kwargs)
-    data = np.random.randn(kwargs["input_size"])
-    result = pipeline.extract(data)
+    fe = feature_extraction.feature_extraction.FeatureExtraction(**kwargs["feature_extraction"])
+    data = build_signal(kwargs["simulation"])
+    result = fe.execute(data)
     assert isinstance(result, np.ndarray)
     assert result.ndim == 1
+    assert len(result) == 6
+
+
+def test_constant_signal_trend(kwargs_features):
+    kwargs = copy.deepcopy(kwargs_features)
+    if kwargs["simulation"]["type"] != "constant":
+        return
+    fe = feature_extraction.feature_extraction.FeatureExtraction(**kwargs["feature_extraction"])
+    data = build_signal(kwargs["simulation"])
+    result = fe.execute(data)
+    value = kwargs["simulation"]["value"]
+    assert result[0] == pytest.approx(value, abs=1e-10)
+    assert result[1] == pytest.approx(0.0, abs=1e-10)
+    assert result[2] == pytest.approx(0.0, abs=1e-10)
+
+
+def test_sine_dominant_frequency(kwargs_features):
+    kwargs = copy.deepcopy(kwargs_features)
+    if kwargs["simulation"]["type"] != "sine":
+        return
+    fe = feature_extraction.feature_extraction.FeatureExtraction(**kwargs["feature_extraction"])
+    data = build_signal(kwargs["simulation"])
+    result = fe.execute(data)
+    assert result[3] == kwargs["simulation"]["cycles"]
+
+
+def test_linear_signal_positive_slope(kwargs_features):
+    kwargs = copy.deepcopy(kwargs_features)
+    if kwargs["simulation"]["type"] != "linear":
+        return
+    fe = feature_extraction.feature_extraction.FeatureExtraction(**kwargs["feature_extraction"])
+    data = build_signal(kwargs["simulation"])
+    result = fe.execute(data)
+    assert result[1] > 0

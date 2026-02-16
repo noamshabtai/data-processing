@@ -1,4 +1,4 @@
-import feature_extraction.pipeline
+import feature_extraction.feature_extraction
 import system.system
 
 import model.predictor
@@ -7,7 +7,7 @@ import model.predictor
 class System(system.system.System):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.modules["features"] = feature_extraction.pipeline.Pipeline(**kwargs.get("features", {}))
+        self.modules["features"] = feature_extraction.feature_extraction.FeatureExtraction(**kwargs.get("features", {}))
         self.modules["predictor"] = model.predictor.Predictor(**kwargs.get("predictor", {}))
 
     def connect(self, module):
