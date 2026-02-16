@@ -2,33 +2,22 @@
 
 Time-series feature extraction using trend analysis and FFT.
 
-## Extractors
+## FeatureExtraction
 
-### TrendExtractor
+Single class that extracts trend and frequency features from a data window.
 
-Computes moving average, slope, and slope volatility from a data window.
+**Output (6 values):** `[last_moving_avg, last_slope, slope_std, dominant_freq_index, dominant_magnitude, mean_magnitude]`
 
-**Output (3 values):** `[last_moving_avg, last_slope, slope_std]`
-
-### FFTExtractor
-
-Performs Fast Fourier Transform to identify dominant frequency components.
-
-**Output (3 values):** `[dominant_freq_index, dominant_magnitude, mean_magnitude]`
-
-### Pipeline
-
-Combines both extractors into a single feature vector.
-
-**Output (6 values):** concatenation of TrendExtractor and FFTExtractor outputs.
+- `_extract_trend` — moving average, slope, and slope volatility (3 values)
+- `_extract_fft` — dominant frequency index, its magnitude, and mean magnitude (3 values)
 
 ## Usage
 
 ```python
-from feature_extraction.pipeline import Pipeline
+from feature_extraction.feature_extraction import FeatureExtraction
 
-pipeline = Pipeline(window_size=20)
-features = pipeline.extract(data)  # numpy array of 6 values
+fe = FeatureExtraction(window_size=20)
+features = fe.execute(data)  # numpy array of 6 values
 ```
 
 ## Dependencies

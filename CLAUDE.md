@@ -61,9 +61,9 @@ AAPL price tick (yfinance Fetcher)
 Input Buffer (sliding window, e.g. last 50 points)
     │
     ▼
-Pipeline (feature-extraction)
-  ├── TrendExtractor → [moving_avg, slope, slope_std]
-  └── FFTExtractor   → [dom_freq, dom_mag, mean_mag]
+FeatureExtraction.execute()
+  ├── _extract_trend → [moving_avg, slope, slope_std]
+  └── _extract_fft   → [dom_freq, dom_mag, mean_mag]
     │
     ▼
 Feature vector: 6 values (this is why input_dim=6 in configs)
@@ -73,19 +73,16 @@ LSTM (2 layers, hidden_dim=32) → Linear(32→1) → prediction
 ```
 
 The `System.connect()` method in `finance-demo` defines data routing using `match`/`case`:
-- buffer output → `Pipeline.extract()`
-- pipeline output → `Predictor.predict()`
+- buffer output → `FeatureExtraction.execute()`
+- feature output → `Model.execute()`
 
 ## Key Classes & Locations
 
 | Class | Module | Path |
 |---|---|---|
 | `Fetcher` | data-fetcher | `data-fetcher/src/data_fetcher/fetcher.py` |
-| `TrendExtractor` | feature-extraction | `feature-extraction/src/feature_extraction/trend.py` |
-| `FFTExtractor` | feature-extraction | `feature-extraction/src/feature_extraction/fft.py` |
-| `Pipeline` | feature-extraction | `feature-extraction/src/feature_extraction/pipeline.py` |
-| `LSTM` | model | `model/src/model/lstm.py` |
-| `Predictor` | model | `model/src/model/predictor.py` |
+| `FeatureExtraction` | feature-extraction | `feature-extraction/src/feature_extraction/feature_extraction.py` |
+| `Model` | model | `model/src/model/model.py` |
 | `System` | finance-demo | `finance-demo/src/finance_demo/system.py` |
 
 ## Model Architecture

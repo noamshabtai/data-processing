@@ -2,30 +2,32 @@
 
 PyTorch LSTM neural network for time-series prediction.
 
-## Components
+## Model
 
-### LSTM
-
-Stacked LSTM layers followed by a fully connected output layer.
+Single class owning the full lifecycle: init, inference, training, save, and load. Internally uses a 2-layer LSTM followed by a fully connected output layer.
 
 **Parameters:**
 - `input_dim` - Number of input features
 - `hidden_dim` - LSTM hidden state dimension
-- `output_dim` - Number of output values
+- `output_dim` - Number of output values (default: 1)
 - `num_layers` - Number of stacked LSTM layers (default: 2)
-
-### Predictor
-
-Inference wrapper around the LSTM model.
 
 ## Usage
 
 ```python
-from model.predictor import Predictor
+from model.model import Model
 
-predictor = Predictor(input_dim=6, hidden_dim=32, output_dim=1, num_layers=2)
-predictor.load("model_weights.pt")
-prediction = predictor.predict(features)  # numpy array in, numpy array out
+m = Model(input_dim=6, hidden_dim=32, output_dim=1, num_layers=2)
+
+# Inference: numpy in, numpy out
+prediction = m.execute(features)
+
+# Training
+loss = m.backward(data, targets, epochs=10, lr=0.001)
+
+# Save and load weights
+m.save("model_weights.pt")
+m.load("model_weights.pt")
 ```
 
 ## Dependencies
