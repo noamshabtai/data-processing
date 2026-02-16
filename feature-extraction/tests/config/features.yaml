@@ -1,4 +1,22 @@
-cases:
-  - name: trend extraction
+base:
+  feature_extraction:
     window_size: 20
-    input_size: 100
+
+cases:
+  - name: deterministic signals
+    sweep:
+      feature_extraction:
+        - window_size: 10
+        - window_size: 20
+        - window_size: 30
+      simulation:
+        - type: constant
+          value: 5.0
+          size: 100
+        - type: linear
+          start: 0
+          stop: 10
+          size: 100
+        - type: sine
+          cycles: 5
+          size: 100
