@@ -76,13 +76,19 @@ So you're always working with the last 50 price points.
 
 Raw prices aren't great direct input for a neural network. Instead, you extract **features** — compact numbers that describe *what the signal looks like*.
 
-This project uses two extractors:
-
-#### TrendExtractor — "Where is the price going?"
+The `FeatureExtraction` class extracts both trend and frequency features in a single `execute()` call:
 
 ```python
-# feature-extraction/src/feature_extraction/trend.py
-def extract(self, data):
+# feature-extraction/src/feature_extraction/feature_extraction.py
+def execute(self, data):
+    features = [self._extract_trend(data), self._extract_fft(data)]
+    return np.concatenate(features)
+```
+
+#### `_extract_trend` — "Where is the price going?"
+
+```python
+def _extract_trend(self, data):
     moving_avg = np.convolve(data, np.ones(self.window_size) / self.window_size, mode="valid")
     slope = np.gradient(moving_avg)
     return np.array([moving_avg[-1], slope[-1], np.std(slope)])
@@ -93,11 +99,10 @@ Three values:
 2. **`slope[-1]`** — is the price going up or down *right now*?
 3. **`np.std(slope)`** — how volatile is the trend? (stable vs. erratic)
 
-#### FFTExtractor — "Are there repeating patterns?"
+#### `_extract_fft` — "Are there repeating patterns?"
 
 ```python
-# feature-extraction/src/feature_extraction/fft.py
-def extract(self, data):
+def _extract_fft(self, data):
     fft_result = np.fft.rfft(data)
     magnitudes = np.abs(fft_result)
     dominant_freq_idx = np.argmax(magnitudes[1:]) + 1
@@ -109,37 +114,35 @@ FFT decomposes a signal into frequencies (like a prism splitting light into colo
 2. **`magnitudes[dominant_freq_idx]`** — how strong is that cycle?
 3. **`np.mean(magnitudes)`** — overall signal energy
 
-#### Pipeline — glue them together
-
 ```python
-# Pipeline.extract() output: [ma, slope, slope_std, freq_idx, freq_mag, mean_mag]
+# FeatureExtraction.execute() output: [ma, slope, slope_std, freq_idx, freq_mag, mean_mag]
 ```
 
 You now have a **6-element feature vector** for each window of data.
 
 ### Step 4: LSTM Prediction (`model`)
 
-This is the PyTorch part. Here's how the LSTM works:
+This is the PyTorch part. The `Model` class owns the full lifecycle — init, inference, training, save, and load. Internally it uses an LSTM `nn.Module`:
 
 ```python
-# model/src/model/lstm.py
-class LSTM(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim, num_layers=2, **kwargs):
+# model/src/model/model.py (internal nn.Module)
+class _LSTM(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim, num_layers=2):
         super().__init__()
         self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True)
         self.fc = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, x):
         lstm_out, _ = self.lstm(x)          # process the sequence
-        output = self.fc(lstm_out[:, -1, :]) # take the last timestep
-        return output
+        return self.fc(lstm_out[:, -1, :])   # take the last timestep
 ```
 
-The `Predictor` class wraps this for inference:
+The `Model` class wraps this for inference and training:
 
 ```python
-# model/src/model/predictor.py
-def predict(self, features):
+# model/src/model/model.py
+def execute(self, features):
+    self.model.eval()
     with torch.no_grad():                        # no gradient tracking (inference only)
         x = torch.from_numpy(features).unsqueeze(0)  # numpy -> tensor, add batch dim
         output = self.model(x)
@@ -155,8 +158,8 @@ The `System` class wires the modules:
 class System(system.system.System):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.modules["features"] = Pipeline(**kwargs.get("features", {}))
-        self.modules["predictor"] = Predictor(**kwargs.get("predictor", {}))
+        self.modules["features"] = FeatureExtraction(**kwargs.get("features", {}))
+        self.modules["predictor"] = Model(**kwargs.get("predictor", {}))
 
     def connect(self, module):
         match module:
@@ -205,10 +208,11 @@ AAPL price tick (yfinance)
 Input Buffer (keeps last 50 points)
     |
     v
-+---------------------+
-|  TrendExtractor     |--> [moving_avg, slope, slope_std]
-|  FFTExtractor       |--> [dom_freq, dom_mag, mean_mag]
-+---------------------+
++------------------------+
+|  FeatureExtraction     |
+|    _extract_trend      |--> [moving_avg, slope, slope_std]
+|    _extract_fft        |--> [dom_freq, dom_mag, mean_mag]
++------------------------+
     |
     v
 Feature vector: [6 values]
@@ -275,8 +279,8 @@ LSTM (2 recurrent layers, 32-dim state) -> Linear(32 -> 1) -> done
 For comparison, here's what 2 hidden FC layers would look like:
 
 ```python
-# CURRENT — no hidden FC layers
-class LSTM(nn.Module):
+# CURRENT — no hidden FC layers (model/src/model/model.py, _LSTM class)
+class _LSTM(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, num_layers=2):
         super().__init__()
         self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True)
@@ -284,8 +288,7 @@ class LSTM(nn.Module):
 
     def forward(self, x):
         lstm_out, _ = self.lstm(x)
-        output = self.fc(lstm_out[:, -1, :])
-        return output
+        return self.fc(lstm_out[:, -1, :])
 ```
 
 ```python
@@ -521,7 +524,7 @@ Same intuition as MLP — more layers = more abstraction:
 In this project's code, `num_layers=2` is set via the YAML config:
 
 ```yaml
-predictor:
+model:
   input_dim: 6       # 6 features from the extraction pipeline
   hidden_dim: 32     # each LSTM layer has 32-dim hidden state
   output_dim: 1      # predict one value
