@@ -28,10 +28,18 @@ An educational guide to how the data-processing project works, from raw stock pr
 - [Deep Dive: Element-wise Operations and Data Flow](#deep-dive-element-wise-operations-and-data-flow)
   - [Element-wise Multiplication](#element-wise-multiplication)
   - [Cell State Flow](#cell-state-flow)
+  - [Why "Long-Term" Memory?](#why-long-term-memory)
   - [Hidden State](#hidden-state)
   - [Input Concatenation](#input-concatenation)
   - [Layer 2 Inputs](#layer-2-inputs)
   - [Full Picture for One Timestep](#full-picture-for-one-timestep)
+- [Deep Dive: Sigmoid vs Tanh](#deep-dive-sigmoid-vs-tanh)
+- [Deep Dive: Training vs Streaming](#deep-dive-training-vs-streaming)
+  - [Training (Offline)](#training-offline)
+  - [Live Prediction (Streaming)](#live-prediction-streaming)
+  - [batch_first=True](#batch_firsttrue)
+  - [self.lstm() Return Values](#selflstm-return-values)
+- [History](#history)
 
 ---
 
@@ -567,6 +575,16 @@ C_0 -> C_1 -> C_2 -> C_3 -> ... -> C_N
 
 The cell state is the **internal memory** that flows across time. The hidden state `h_t` is a filtered view of it — what the cell chooses to expose.
 
+### Why "Long-Term" Memory?
+
+The cell state `c` flows through time with only element-wise operations (`*` and `+`). No matrix multiplications, no squashing functions applied directly to it. Gradients flow back through it without shrinking, so it can carry information across many timesteps.
+
+In a plain RNN, everything passes through matrix multiplications at every step, so signals decay quickly (the vanishing gradient problem). The cell state is a protected highway that avoids that.
+
+The cell state itself is **unbounded** — it accumulates values over time through `c_t = f * c_{t-1} + i * candidate`. The forget gate can scale it down and the input gate adds new values, but there's no clamp on the result. The hidden state `h` is bounded though, because `h_t = o * tanh(c_t)` squashes the cell state to -1 to 1 before the output gate filters it.
+
+So `c` is a raw accumulator, `h` is a bounded view of it.
+
 ### Hidden State
 
 `h_t` is a single vector of 32 values. It's the output of the LSTM cell at timestep `t`. Not "all outputs stacked" — just one timestep's output.
@@ -664,3 +682,104 @@ x_t (6 values)
 ```
 
 So it's not a `38->32->1` network. Each layer has **4 separate linear transforms** (the 4 gates), plus memory mechanics, and it runs this **at every timestep**. That's what makes it fundamentally different from an MLP.
+
+---
+
+## Deep Dive: Sigmoid vs Tanh
+
+Sigmoid and tanh have different output ranges and serve different purposes:
+
+- **Sigmoid** (0 to 1) — used for gates. It's a "how much" dial. 0 means block everything, 1 means let everything through. Perfect for controlling information flow.
+- **Tanh** (-1 to 1) — used for values. The candidate values and the cell state readout use tanh because actual data can be negative. Sigmoid can't represent negative values.
+
+Where each is used:
+
+```
+f = sigmoid(...)     gate: how much to forget (0-1)
+i = sigmoid(...)     gate: how much to write (0-1)
+candidate = tanh(...) value: what to write (-1 to 1)
+o = sigmoid(...)     gate: how much to expose (0-1)
+h_t = o * tanh(c_t)  value: bounded output (-1 to 1)
+```
+
+---
+
+## Deep Dive: Training vs Streaming
+
+### Training (Offline)
+
+You take historical data (e.g., 1000 price points) and slide a window across it to create overlapping sequences:
+
+```
+prices: [p1, p2, p3, p4, p5, p6, p7, ...]
+
+sequence 1: [p1, p2, p3, p4, p5]  → target: p6
+sequence 2: [p2, p3, p4, p5, p6]  → target: p7
+sequence 3: [p3, p4, p5, p6, p7]  → target: p8
+...
+```
+
+Each sequence goes through feature extraction to become `(seq_len, 6)`. These get grouped into **batches** and fed to the training loop.
+
+`batch_size` is the number of sequences **per batch**, not the number of batches. If you have 800 sequences and `batch_size=8`, that's 100 batches.
+
+One **epoch** = one pass through all the data:
+
+```
+epoch
+├── batch 1:  sequences 1-8
+├── batch 2:  sequences 9-16
+├── batch 3:  sequences 17-24
+├── ...
+└── batch 100: sequences 793-800
+```
+
+Each batch has shape `(batch_size, seq_len, 6)`. The LSTM processes all sequences in a batch independently but simultaneously — matrix multiplication on a batch is much faster than looping one sequence at a time. After all 100 batches, the epoch is done. Then you repeat for the next epoch.
+
+### Live Prediction (Streaming)
+
+The buffer holds the latest window (e.g., last 50 points). Each new price pushes the window forward by one. Feature extraction runs on the window, producing one `(seq_len, 6)` array. That goes to `execute` — one sequence, one prediction. No batches, no epochs.
+
+```python
+# Model.execute()
+x = torch.from_numpy(features)          # shape (seq_len, 6)
+x = x.unsqueeze(0)                      # shape (1, seq_len, 6) — fake batch of 1
+output = self.model(x)                   # shape (1, 1)
+return output.squeeze(0).numpy()         # shape (1,) — remove the fake batch dim
+```
+
+The LSTM always expects a batch dimension. `unsqueeze(0)` adds it, `squeeze(0)` removes it.
+
+### batch_first=True
+
+```python
+nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True)
+```
+
+Without `batch_first=True`, `nn.LSTM` expects shape `(seq_len, batch, features)`. With it, the shape is `(batch, seq_len, features)`. It's just a convention choice — batch-first is more intuitive since most code thinks in terms of `(batch, ...)`. Either way works, the batch dimension exists regardless of its size.
+
+### self.lstm() Return Values
+
+`self.lstm(x)` returns two things:
+
+1. **`lstm_out`** — the last layer's hidden state at **every** timestep, stacked. Shape `(batch, seq_len, hidden_dim)`.
+2. **`(h_final, c_final)`** — the final hidden state and cell state for **all** layers. We discard this with `_` because we already have the last timestep's hidden state in `lstm_out`.
+
+```python
+lstm_out, _ = self.lstm(x)       # lstm_out: (batch, seq_len, 32)
+lstm_out[:, -1, :]               # (batch, 32) — just the last timestep
+```
+
+For a single streaming prediction with `batch=1` and `seq_len=10`:
+
+```
+lstm_out shape: (1, 10, 32)     — h2 at all 10 timesteps
+lstm_out[:, -1, :] shape: (1, 32) — h2 at timestep 10 only
+self.fc(...) shape: (1, 1)       — one prediction
+```
+
+---
+
+## History
+
+The LSTM was not discovered by luck. Hochreiter and Schmidthuber published it in 1997, specifically to solve the vanishing gradient problem they had mathematically analyzed in plain RNNs. The forget gate was added later by Gers et al. (2000). The architecture was engineered, not found by accident — though there's been empirical work since then testing which gates are actually necessary (GRU, for example, simplifies to two gates and works nearly as well).
