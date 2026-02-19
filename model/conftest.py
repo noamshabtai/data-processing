@@ -8,6 +8,7 @@ config_dir = tests_dir / "config"
 module = sys.modules[__name__]
 for fixture in [
     "model",
+    "network",
 ]:
     parametrize_tests.fixtures.setattr_kwargs(fixture, config_dir, module)
 

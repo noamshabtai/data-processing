@@ -134,7 +134,7 @@ This is the PyTorch part. The `Model` class owns the full lifecycle — init, in
 
 ```python
 # model/src/model/model.py (internal nn.Module)
-class _LSTM(nn.Module):
+class _Network(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, num_layers=2):
         super().__init__()
         self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True)
@@ -287,8 +287,8 @@ LSTM (2 recurrent layers, 32-dim state) -> Linear(32 -> 1) -> done
 For comparison, here's what 2 hidden FC layers would look like:
 
 ```python
-# CURRENT — no hidden FC layers (model/src/model/model.py, _LSTM class)
-class _LSTM(nn.Module):
+# CURRENT — no hidden FC layers (model/src/model/model.py, _Network class)
+class _Network(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, num_layers=2):
         super().__init__()
         self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True)

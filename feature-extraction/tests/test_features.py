@@ -17,9 +17,9 @@ def build_signal(simulation):
 
 def test_feature_extraction_output_shape(kwargs_features):
     kwargs = copy.deepcopy(kwargs_features)
-    fe = feature_extraction.feature_extraction.FeatureExtraction(**kwargs["feature_extraction"])
+    tested = feature_extraction.feature_extraction.FeatureExtraction(**kwargs["feature_extraction"])
     data = build_signal(kwargs["simulation"])
-    result = fe.execute(data)
+    result = tested.execute(data)
     assert isinstance(result, np.ndarray)
     assert result.ndim == 1
     assert len(result) == 6
@@ -29,9 +29,9 @@ def test_constant_signal_trend(kwargs_features):
     kwargs = copy.deepcopy(kwargs_features)
     if kwargs["simulation"]["type"] != "constant":
         return
-    fe = feature_extraction.feature_extraction.FeatureExtraction(**kwargs["feature_extraction"])
+    tested = feature_extraction.feature_extraction.FeatureExtraction(**kwargs["feature_extraction"])
     data = build_signal(kwargs["simulation"])
-    result = fe.execute(data)
+    result = tested.execute(data)
     value = kwargs["simulation"]["value"]
     assert result[0] == pytest.approx(value, abs=1e-10)
     assert result[1] == pytest.approx(0.0, abs=1e-10)
@@ -42,9 +42,9 @@ def test_sine_dominant_frequency(kwargs_features):
     kwargs = copy.deepcopy(kwargs_features)
     if kwargs["simulation"]["type"] != "sine":
         return
-    fe = feature_extraction.feature_extraction.FeatureExtraction(**kwargs["feature_extraction"])
+    tested = feature_extraction.feature_extraction.FeatureExtraction(**kwargs["feature_extraction"])
     data = build_signal(kwargs["simulation"])
-    result = fe.execute(data)
+    result = tested.execute(data)
     assert result[3] == kwargs["simulation"]["cycles"]
 
 
@@ -52,7 +52,7 @@ def test_linear_signal_positive_slope(kwargs_features):
     kwargs = copy.deepcopy(kwargs_features)
     if kwargs["simulation"]["type"] != "linear":
         return
-    fe = feature_extraction.feature_extraction.FeatureExtraction(**kwargs["feature_extraction"])
+    tested = feature_extraction.feature_extraction.FeatureExtraction(**kwargs["feature_extraction"])
     data = build_signal(kwargs["simulation"])
-    result = fe.execute(data)
+    result = tested.execute(data)
     assert result[1] > 0
