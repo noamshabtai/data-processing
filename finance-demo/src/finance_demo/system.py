@@ -1,14 +1,14 @@
 import feature_extraction.feature_extraction
 import system.system
 
-import model.model
+import model.trainer
 
 
 class System(system.system.System):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.modules["features"] = feature_extraction.feature_extraction.FeatureExtraction(**kwargs.get("features", {}))
-        self.modules["predictor"] = model.model.Model(**kwargs.get("predictor", {}))
+        self.modules["predictor"] = model.trainer.Trainer(**kwargs.get("predictor", {}))
 
     def connect(self, module):
         match module:
