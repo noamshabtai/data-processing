@@ -1,16 +1,16 @@
-from torch import nn
+import torch
 
 
-class Model(nn.Module):
+class Model(torch.nn.Module):
     def __init__(self, **kwargs):
         super().__init__()
-        self.lstm = nn.LSTM(
+        self.lstm = torch.nn.LSTM(
             input_size=kwargs["input_dim"],
             hidden_size=kwargs["hidden_dim"],
             num_layers=kwargs.get("num_layers", 2),
             batch_first=True,
         )
-        self.fc = nn.Linear(
+        self.fc = torch.nn.Linear(
             in_features=kwargs["hidden_dim"],
             out_features=kwargs.get("output_dim", 1),
         )
