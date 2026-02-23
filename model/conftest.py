@@ -7,8 +7,8 @@ tests_dir = pathlib.Path(__file__).parent / "tests"
 config_dir = tests_dir / "config"
 module = sys.modules[__name__]
 for fixture in [
+    "trainer",
     "model",
-    "network",
 ]:
     parametrize_tests.fixtures.setattr_kwargs(fixture, config_dir, module)
 

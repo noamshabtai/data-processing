@@ -1,0 +1,22 @@
+base:
+  model:
+    epochs: 10
+    learning_rate: 0.001
+    batch_size: 4
+    data_shuffle: true
+    network:
+      input_dim: 6
+      hidden_dim: 32
+      output_dim: 1
+      num_layers: 2
+
+cases:
+  - name: model
+    simulation:
+      sweep:
+        seq_len: [10, 20]
+        num_samples: [16, 24]
+    model:
+      network:
+        sweep:
+          num_layers: [1, 2]

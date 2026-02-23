@@ -1,48 +1,20 @@
-import torch
-
-from . import network
+from torch import nn
 
 
-class Model:
+class Model(nn.Module):
     def __init__(self, **kwargs):
-        self.epochs = kwargs.get("epochs")
-        self.learning_rate = kwargs.get("learning_rate")
-        self.batch_size = kwargs.get("batch_size")
-        self.data_shuffle = kwargs.get("data_shuffle", True)
-        self.model = network.Network(**kwargs["network"])
-
-    def execute(self, features):
-        self.model.eval()
-        with torch.no_grad():
-            x = torch.from_numpy(features).unsqueeze(0)
-            output = self.model(x)
-            return output.squeeze(0).numpy()
-
-    def backward(self, data, targets):
-        self.model.train()
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.learning_rate)
-        criterion = torch.nn.MSELoss()
-        x = torch.from_numpy(data)
-        y = torch.from_numpy(targets)
-        batch_size = self.batch_size if self.batch_size is not None else len(x)
-        loader = torch.utils.data.DataLoader(
-            torch.utils.data.TensorDataset(x, y), batch_size=batch_size, shuffle=self.data_shuffle
+        super().__init__()
+        self.lstm = nn.LSTM(
+            input_size=kwargs["input_dim"],
+            hidden_size=kwargs["hidden_dim"],
+            num_layers=kwargs.get("num_layers", 2),
+            batch_first=True,
         )
-        epoch_losses = []
-        for _ in range(self.epochs):
-            batch_losses = []
-            for x_batch, y_batch in loader:
-                optimizer.zero_grad()
-                output = self.model(x_batch)
-                loss = criterion(output, y_batch)
-                loss.backward()
-                optimizer.step()
-                batch_losses.append(loss.item())
-            epoch_losses.append(sum(batch_losses) / len(batch_losses))
-        return epoch_losses
+        self.fc = nn.Linear(
+            in_features=kwargs["hidden_dim"],
+            out_features=kwargs.get("output_dim", 1),
+        )
 
-    def save(self, path):
-        torch.save(self.model.state_dict(), path)
-
-    def load(self, path):
-        self.model.load_state_dict(torch.load(path, weights_only=True))
+    def forward(self, x):
+        lstm_out, _ = self.lstm(x)
+        return self.fc(lstm_out[:, -1, :])
