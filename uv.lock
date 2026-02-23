@@ -370,6 +370,13 @@ requires-dist = [
     { name = "yfinance" },
 ]
 
+[package.metadata.requires-dev]
+dev = [
+    { name = "parametrize-tests", editable = "../signal-processing/parametrize-tests" },
+    { name = "pytest", specifier = ">=9.0.2" },
+    { name = "pytest-mock", specifier = ">=3.15.1" },
+]
+
 [[package]]
 name = "data-processing"
 version = "0.1.0"
@@ -379,10 +386,8 @@ dependencies = [
     { name = "buffer" },
     { name = "data-fetcher" },
     { name = "feature-extraction" },
-    { name = "finance-demo" },
     { name = "model" },
     { name = "parametrize-tests" },
-    { name = "stock-analyzer" },
     { name = "system" },
 ]
 
@@ -399,10 +404,8 @@ requires-dist = [
     { name = "buffer", editable = "../signal-processing/buffer" },
     { name = "data-fetcher", editable = "data-fetcher" },
     { name = "feature-extraction", editable = "feature-extraction" },
-    { name = "finance-demo", editable = "finance-demo" },
     { name = "model", editable = "model" },
     { name = "parametrize-tests", editable = "../signal-processing/parametrize-tests" },
-    { name = "stock-analyzer", editable = "stock-analyzer" },
     { name = "system", editable = "../signal-processing/system" },
 ]
 
@@ -476,25 +479,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/1d/65/ce7f1b70157833bf3cb851b556a37d4547ceafc158aa9b34b36782f23696/filelock-3.20.3.tar.gz", hash = "sha256:18c57ee915c7ec61cff0ecf7f0f869936c7c30191bb0cf406f1341778d0834e1", size = 19485, upload-time = "2026-01-09T17:55:05.421Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b5/36/7fb70f04bf00bc646cd5bb45aa9eddb15e19437a28b8fb2b4a5249fac770/filelock-3.20.3-py3-none-any.whl", hash = "sha256:4b0dda527ee31078689fc205ec4f1c1bf7d56cf88b6dc9426c4f230e46c2dce1", size = 16701, upload-time = "2026-01-09T17:55:04.334Z" },
-]
-
-[[package]]
-name = "finance-demo"
-version = "0.1.0"
-source = { editable = "finance-demo" }
-dependencies = [
-    { name = "data-fetcher" },
-    { name = "feature-extraction" },
-    { name = "model" },
-    { name = "signal-processing" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "data-fetcher" },
-    { name = "feature-extraction" },
-    { name = "model" },
-    { name = "signal-processing" },
 ]
 
 [[package]]
@@ -797,6 +781,12 @@ dependencies = [
 requires-dist = [
     { name = "numpy" },
     { name = "torch" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "parametrize-tests", editable = "../signal-processing/parametrize-tests" },
+    { name = "pytest", specifier = ">=9.0.2" },
 ]
 
 [[package]]
@@ -1453,12 +1443,6 @@ wheels = [
 ]
 
 [[package]]
-name = "signal-processing"
-version = "0.0.5"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/7c/35/bd5c589656ba8351e0999fb909a0b4a30a5610a6e56ad14d633cd0231ec7/signal_processing-0.0.5.tar.gz", hash = "sha256:4fc7289fb6938a07f92f1c2e5e27f01c6cdb123b9d3421f6daced21ec55a6be9", size = 3726, upload-time = "2018-09-13T18:28:35.263Z" }
-
-[[package]]
 name = "six"
 version = "1.17.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1475,17 +1459,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/7b/ae/2d9c981590ed9999a
 wheels = [
     { url = "https://files.pythonhosted.org/packages/46/2c/1462b1d0a634697ae9e55b3cecdcb64788e8b7d63f54d923fcd0bb140aed/soupsieve-2.8.3-py3-none-any.whl", hash = "sha256:ed64f2ba4eebeab06cc4962affce381647455978ffc1e36bb79a545b91f45a95", size = 37016, upload-time = "2026-01-20T04:27:01.012Z" },
 ]
-
-[[package]]
-name = "stock-analyzer"
-version = "0.1.0"
-source = { editable = "stock-analyzer" }
-dependencies = [
-    { name = "finance-demo" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "finance-demo" }]
 
 [[package]]
 name = "sympy"
