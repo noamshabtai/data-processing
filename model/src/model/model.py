@@ -15,6 +15,9 @@ class Model(torch.nn.Module):
             out_features=kwargs.get("output_dim", 1),
         )
 
+    def load(self, path):
+        self.load_state_dict(torch.load(path, weights_only=True))
+
     def forward(self, x):
         lstm_out, _ = self.lstm(x)
         return self.fc(lstm_out[:, -1, :])

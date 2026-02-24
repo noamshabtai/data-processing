@@ -45,4 +45,4 @@ class Trainer:
         torch.save(self.model.state_dict(), path)
 
     def load(self, path):
-        self.model.load_state_dict(torch.load(path, weights_only=True))
+        self.model.load(path)
