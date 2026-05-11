@@ -25,8 +25,7 @@ prediction = m.execute(features)
 # Training
 loss = m.backward(data, targets, epochs=10, lr=0.001)
 
-# Save and load weights
-m.save("model_weights.pt")
+# Load weights for inference
 m.load("model_weights.pt")
 ```
 

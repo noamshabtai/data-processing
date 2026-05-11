@@ -3,16 +3,14 @@ base:
     input_dim: 6
     hidden_dim: 32
     output_dim: 1
-    num_layers: 2
+  simulation:
+    seq_len: 10
+    batch_size: 4
 
 cases:
-  - name: network
-    sweep:
-      network:
-        - num_layers: 1
-        - num_layers: 2
-      simulation:
-        - seq_len: 10
-          batch_size: 4
-        - seq_len: 20
-          batch_size: 8
+  - name: num_layers_1
+    network:
+      num_layers: 1
+  - name: num_layers_2
+    network:
+      num_layers: 2

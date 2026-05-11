@@ -10,6 +10,7 @@ class Trainer:
         self.batch_size = kwargs.get("batch_size")
         self.data_shuffle = kwargs.get("data_shuffle", True)
         self.model = model.Model(**kwargs["network"])
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.learning_rate)
 
     def execute(self, features):
         self.model.eval()
@@ -20,7 +21,6 @@ class Trainer:
 
     def backward(self, data, targets):
         self.model.train()
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.learning_rate)
         criterion = torch.nn.MSELoss()
         x = torch.from_numpy(data)
         y = torch.from_numpy(targets)
@@ -32,17 +32,19 @@ class Trainer:
         for _ in range(self.epochs):
             batch_losses = []
             for x_batch, y_batch in loader:
-                optimizer.zero_grad()
+                self.optimizer.zero_grad()
                 output = self.model(x_batch)
                 loss = criterion(output, y_batch)
                 loss.backward()
-                optimizer.step()
+                self.optimizer.step()
                 batch_losses.append(loss.item())
             epoch_losses.append(sum(batch_losses) / len(batch_losses))
         return epoch_losses
 
-    def save(self, path):
-        torch.save(self.model.state_dict(), path)
+    def save_checkpoint(self, path):
+        torch.save({"model": self.model.state_dict(), "optimizer": self.optimizer.state_dict()}, path)
 
-    def load(self, path):
-        self.model.load(path)
+    def load_checkpoint(self, path):
+        checkpoint = torch.load(path, weights_only=True)
+        self.model.load_state_dict(checkpoint["model"])
+        self.optimizer.load_state_dict(checkpoint["optimizer"])

@@ -16,7 +16,6 @@ version = "0.1.0"
 source = { editable = "../signal-processing/activator" }
 dependencies = [
     { name = "audio-io" },
-    { name = "data-types" },
     { name = "matplotlib" },
     { name = "pyaudio" },
     { name = "system" },
@@ -25,7 +24,6 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "audio-io", editable = "../signal-processing/audio-io" },
-    { name = "data-types", editable = "../signal-processing/data-types" },
     { name = "matplotlib", specifier = ">=3.10.0" },
     { name = "pyaudio", specifier = ">=0.2.14" },
     { name = "system", editable = "../signal-processing/system" },
@@ -43,14 +41,12 @@ name = "audio-io"
 version = "0.1.0"
 source = { editable = "../signal-processing/audio-io" }
 dependencies = [
-    { name = "data-types" },
     { name = "numpy" },
     { name = "pyaudio" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "data-types", editable = "../signal-processing/data-types" },
     { name = "numpy", specifier = ">=2.2.3" },
     { name = "pyaudio", specifier = ">=0.2.14" },
 ]
@@ -413,23 +409,6 @@ dev = [
     { name = "pre-commit", specifier = ">=4.1.0" },
     { name = "pytest", specifier = ">=8.3.4" },
     { name = "pytest-mock", specifier = ">=3.14.0" },
-]
-
-[[package]]
-name = "data-types"
-version = "0.1.0"
-source = { editable = "../signal-processing/data-types" }
-dependencies = [
-    { name = "numpy" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "numpy", specifier = ">=2.3.5" }]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "parametrize-tests", editable = "../signal-processing/parametrize-tests" },
-    { name = "pytest", specifier = ">=9.0.1" },
 ]
 
 [[package]]
@@ -1093,7 +1072,10 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pytest", specifier = ">=9.0.1" }]
+dev = [
+    { name = "lizard", specifier = ">=1.22.1" },
+    { name = "pytest", specifier = ">=9.0.1" },
+]
 
 [[package]]
 name = "peewee"

@@ -15,7 +15,7 @@ class Model(torch.nn.Module):
             out_features=kwargs.get("output_dim", 1),
         )
 
-    def load(self, path):
+    def load_weights(self, path):
         self.load_state_dict(torch.load(path, weights_only=True))
 
     def forward(self, x):
