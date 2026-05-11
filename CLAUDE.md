@@ -12,7 +12,6 @@ data-processing/
 ├── feature-extraction/    # Trend and FFT feature extractors
 ├── model/                 # PyTorch LSTM neural network
 ├── stock-analyzer/        # CLI tool for training and prediction (predictor system + demo)
-├── parametrize-tests/     # YAML-based pytest parametrization (shared with signal-processing)
 └── .github/workflows/     # CI/CD
 ```
 
@@ -73,7 +72,7 @@ LSTM (2 layers, hidden_dim=32) → Linear(32→1) → prediction
 
 The `Predictor.connect()` method in `stock-analyzer` defines data routing using `match`/`case`:
 - buffer output → `FeatureExtraction.execute()`
-- feature output → `Model.execute()`
+- feature output → `Trainer.execute()`
 
 ## Key Classes & Locations
 
@@ -82,6 +81,7 @@ The `Predictor.connect()` method in `stock-analyzer` defines data routing using 
 | `Fetcher` | data-fetcher | `data-fetcher/src/data_fetcher/fetcher.py` |
 | `FeatureExtraction` | feature-extraction | `feature-extraction/src/feature_extraction/feature_extraction.py` |
 | `Model` | model | `model/src/model/model.py` |
+| `Trainer` | model | `model/src/model/trainer.py` |
 | `Predictor` | stock-analyzer | `stock-analyzer/src/stock_analyzer/predictor.py` |
 
 ## Model Architecture
