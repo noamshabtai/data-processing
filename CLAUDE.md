@@ -11,7 +11,7 @@ data-processing/
 ├── data-fetcher/          # Stock data acquisition via yfinance
 ├── feature-extraction/    # Trend and FFT feature extractors
 ├── model/                 # PyTorch LSTM neural network
-├── stock-analyzer/        # CLI tool for training and prediction (predictor system + demo)
+├── stock-analyzer/        # Orchestrator: wires the pipeline together (train + predict)
 └── .github/workflows/     # CI/CD
 ```
 
@@ -70,7 +70,7 @@ Feature vector: 6 values (this is why input_dim=6 in configs)
 LSTM (2 layers, hidden_dim=32) → Linear(32→1) → prediction
 ```
 
-The `Predictor.connect()` method in `stock-analyzer` defines data routing using `match`/`case`:
+The `StockAnalyzer.connect()` method in `stock-analyzer` defines data routing using `match`/`case`:
 - buffer output → `FeatureExtraction.execute()`
 - feature output → `Trainer.execute()`
 
@@ -82,7 +82,7 @@ The `Predictor.connect()` method in `stock-analyzer` defines data routing using 
 | `FeatureExtraction` | feature-extraction | `feature-extraction/src/feature_extraction/feature_extraction.py` |
 | `Model` | model | `model/src/model/model.py` |
 | `Trainer` | model | `model/src/model/trainer.py` |
-| `Predictor` | stock-analyzer | `stock-analyzer/src/stock_analyzer/predictor.py` |
+| `StockAnalyzer` | stock-analyzer | `stock-analyzer/src/stock_analyzer/stock_analyzer.py` |
 
 ## Model Architecture
 
@@ -90,13 +90,6 @@ The `Predictor.connect()` method in `stock-analyzer` defines data routing using 
 
 ```
 LSTM(input_dim=6, hidden_dim=32, num_layers=2) → Linear(32→1) → prediction
-```
-
-## CLI Usage
-
-```bash
-stock-analyzer train --symbol AAPL --period 1y --epochs 10 --output model.pt
-stock-analyzer predict --symbol AAPL --model model.pt
 ```
 
 ## Key Patterns

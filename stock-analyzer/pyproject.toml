@@ -9,9 +9,6 @@ authors = [
 requires-python = ">=3.12"
 dependencies = []
 
-[project.scripts]
-stock-analyzer = "stock_analyzer:main"
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
