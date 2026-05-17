@@ -3,11 +3,10 @@ name = "stock-analyzer"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
-    "finance-demo",
+    "feature-extraction",
+    "model",
+    "system",
 ]
-
-[project.scripts]
-stock-analyzer = "stock_analyzer.cli:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -15,3 +14,15 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/stock_analyzer"]
+
+[tool.uv.sources]
+feature-extraction = { path = "../feature-extraction", editable = true }
+model = { path = "../model", editable = true }
+system = { path = "../../signal-processing/system", editable = true }
+parametrize-tests = { path = "../../signal-processing/parametrize-tests", editable = true }
+
+[dependency-groups]
+dev = [
+    "parametrize-tests",
+    "pytest>=9.0.2",
+]

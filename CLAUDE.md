@@ -11,9 +11,7 @@ data-processing/
 ├── data-fetcher/          # Stock data acquisition via yfinance
 ├── feature-extraction/    # Trend and FFT feature extractors
 ├── model/                 # PyTorch LSTM neural network
-├── finance-demo/          # Integrated demo pipeline
-├── stock-analyzer/        # CLI tool for training and prediction
-├── parametrize-tests/     # YAML-based pytest parametrization (shared with signal-processing)
+├── stock-analyzer/        # Orchestrator: wires the pipeline together (train + predict)
 └── .github/workflows/     # CI/CD
 ```
 
@@ -26,7 +24,7 @@ This project depends on the [signal-processing](https://github.com/noamshabtai/s
 - **Python:** >=3.12
 - **Package manager:** uv
 - **Install:** `uv sync`
-- **Run tests:** `pytest -n 6`
+- **Run tests:** `uv run pytest`
 - **Pre-commit:** `pre-commit run --all-files`
 
 ## Code Style
@@ -46,10 +44,10 @@ This project depends on the [signal-processing](https://github.com/noamshabtai/s
 ## Module Dependency Graph
 
 ```
-stock-analyzer -> finance-demo -> feature-extraction (numpy, scipy)
-                               -> model (torch, numpy)
-                               -> data-fetcher (yfinance, pandas)
-                               -> signal-processing (activator, system, buffer)
+stock-analyzer -> feature-extraction (numpy, scipy)
+               -> model (torch, numpy)
+               -> data-fetcher (yfinance, pandas)
+               -> signal-processing (activator, system, buffer)
 ```
 
 ## Data Flow Pipeline
@@ -72,9 +70,9 @@ Feature vector: 6 values (this is why input_dim=6 in configs)
 LSTM (2 layers, hidden_dim=32) → Linear(32→1) → prediction
 ```
 
-The `System.connect()` method in `finance-demo` defines data routing using `match`/`case`:
+The `StockAnalyzer.connect()` method in `stock-analyzer` defines data routing using `match`/`case`:
 - buffer output → `FeatureExtraction.execute()`
-- feature output → `Model.execute()`
+- feature output → `Trainer.execute()`
 
 ## Key Classes & Locations
 
@@ -83,7 +81,8 @@ The `System.connect()` method in `finance-demo` defines data routing using `matc
 | `Fetcher` | data-fetcher | `data-fetcher/src/data_fetcher/fetcher.py` |
 | `FeatureExtraction` | feature-extraction | `feature-extraction/src/feature_extraction/feature_extraction.py` |
 | `Model` | model | `model/src/model/model.py` |
-| `System` | finance-demo | `finance-demo/src/finance_demo/system.py` |
+| `Trainer` | model | `model/src/model/trainer.py` |
+| `StockAnalyzer` | stock-analyzer | `stock-analyzer/src/stock_analyzer/stock_analyzer.py` |
 
 ## Model Architecture
 
@@ -91,13 +90,6 @@ The `System.connect()` method in `finance-demo` defines data routing using `matc
 
 ```
 LSTM(input_dim=6, hidden_dim=32, num_layers=2) → Linear(32→1) → prediction
-```
-
-## CLI Usage
-
-```bash
-stock-analyzer train --symbol AAPL --period 1y --epochs 10 --output model.pt
-stock-analyzer predict --symbol AAPL --model model.pt
 ```
 
 ## Key Patterns

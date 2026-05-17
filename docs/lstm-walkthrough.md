@@ -9,8 +9,6 @@ An educational guide to how the data-processing project works, from raw stock pr
   - [Step 2: Buffering](#step-2-buffering-signal-processing--external)
   - [Step 3: Feature Extraction](#step-3-feature-extraction-feature-extraction)
   - [Step 4: LSTM Prediction](#step-4-lstm-prediction-model)
-  - [Step 5: System Integration](#step-5-system-integration-finance-demo)
-  - [Step 6: CLI](#step-6-cli-stock-analyzer)
   - [Full Data Flow Diagram](#full-data-flow-diagram)
 - [PyTorch Concepts](#pytorch-concepts)
   - [nn.Module](#nnmodule)
@@ -156,56 +154,6 @@ def execute(self, features):
         output = self.model(x)
         return output.numpy().squeeze()          # tensor -> numpy, remove batch dim
 ```
-
-### Step 5: System Integration (`finance-demo`)
-
-The `System` class wires the modules:
-
-```python
-# finance-demo/src/finance_demo/system.py
-class System(system.system.System):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.modules["features"] = FeatureExtraction(**kwargs.get("features", {}))
-        self.modules["predictor"] = Model(**kwargs.get("predictor", {}))
-
-    def connect(self, module):
-        match module:
-            case "features":
-                self.inputs[module] = dict(data=self.input_buffer.get_window())
-            case "predictor":
-                self.inputs[module] = dict(features=self.outputs["features"])
-```
-
-The `connect` method defines the **data routing**: buffer output feeds into features, features output feeds into predictor.
-
-The `Activator` runs the loop:
-
-```python
-# finance-demo/src/finance_demo/demo.py
-def execute(self):
-    self.running = True
-    while self.running:
-        frame = self._fetch_latest()       # get new price
-        if frame is not None:
-            prediction = self.process_frame(frame)  # buffer -> features -> LSTM
-            if prediction is not None:
-                self._log_prediction(frame, prediction)
-        time.sleep(self.poll_interval)     # wait 60s, repeat
-```
-
-Every 60 seconds: fetch price, push through the pipeline, print prediction.
-
-### Step 6: CLI (`stock-analyzer`)
-
-The entry point for users:
-
-```bash
-stock-analyzer train --symbol AAPL --period 1y --epochs 10 --output model.pt
-stock-analyzer predict --symbol AAPL --model model.pt
-```
-
-This is the thin command-line layer that orchestrates training and live prediction using all the modules above.
 
 ### Full Data Flow Diagram
 

@@ -17,9 +17,7 @@ Stock Data (yfinance) -> Input Buffer -> Feature Extraction -> LSTM Model -> Pre
 | [data-fetcher](data-fetcher/) | Fetch historical and real-time stock data via Yahoo Finance |
 | [feature-extraction](feature-extraction/) | Trend and FFT feature extractors for time-series data |
 | [model](model/) | PyTorch LSTM neural network for prediction |
-| [finance-demo](finance-demo/) | Integrated pipeline combining all modules |
-| [stock-analyzer](stock-analyzer/) | CLI tool for training models and running predictions |
-| [parametrize-tests](parametrize-tests/) | YAML-based pytest parametrization utility |
+| [stock-analyzer](stock-analyzer/) | Orchestrator that wires the pipeline (Fetcher → Buffer → Features → Model) |
 
 ## Prerequisites
 

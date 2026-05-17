@@ -1,10 +1,11 @@
 # model
 
-PyTorch LSTM neural network for time-series prediction.
+PyTorch LSTM for time-series prediction. Split into two classes:
+
+- `Model` — the `torch.nn.Module` (LSTM + Linear). Pure inference, plus weight loading for swapping in pretrained weights.
+- `Trainer` — owns the training lifecycle: optimizer, `backward` loop, numpy-friendly `execute`, and full checkpointing (model + optimizer state).
 
 ## Model
-
-Single class owning the full lifecycle: init, inference, training, save, and load. Internally uses a 2-layer LSTM followed by a fully connected output layer.
 
 **Parameters:**
 - `input_dim` - Number of input features
@@ -12,22 +13,37 @@ Single class owning the full lifecycle: init, inference, training, save, and loa
 - `output_dim` - Number of output values (default: 1)
 - `num_layers` - Number of stacked LSTM layers (default: 2)
 
-## Usage
-
 ```python
 from model.model import Model
 
 m = Model(input_dim=6, hidden_dim=32, output_dim=1, num_layers=2)
 
+# Load pretrained weights for inference
+m.load_weights("weights.pt")
+```
+
+## Trainer
+
+Wraps a `Model` and an `Adam` optimizer. The optimizer is persistent on the instance so its adaptive state (momentum, second moments, step count) survives across `backward` calls and is captured by `save_checkpoint`.
+
+**Parameters:**
+- `network` - dict of `Model` kwargs
+- `epochs`, `learning_rate`, `batch_size`, `data_shuffle`
+
+```python
+from model.trainer import Trainer
+
+t = Trainer(network={"input_dim": 6, "hidden_dim": 32}, epochs=10, learning_rate=0.001, batch_size=4)
+
 # Inference: numpy in, numpy out
-prediction = m.execute(features)
+prediction = t.execute(features)
 
 # Training
-loss = m.backward(data, targets, epochs=10, lr=0.001)
+epoch_losses = t.backward(data, targets)
 
-# Save and load weights
-m.save("model_weights.pt")
-m.load("model_weights.pt")
+# Checkpointing: model weights + optimizer state in one file
+t.save_checkpoint("checkpoint.pt")
+t.load_checkpoint("checkpoint.pt")
 ```
 
 ## Dependencies
