@@ -12,6 +12,7 @@ dependencies = [
     "data-fetcher",
     "feature-extraction",
     "model",
+    "stock-analyzer",
 ]
 
 [dependency-groups]
@@ -29,3 +30,9 @@ parametrize-tests = { path = "../signal-processing/parametrize-tests", editable 
 data-fetcher = { path = "data-fetcher", editable = true }
 feature-extraction = { path = "feature-extraction", editable = true }
 model = { path = "model", editable = true }
+stock-analyzer = { workspace = true, editable = true }
+
+[tool.uv.workspace]
+members = [
+    "stock-analyzer",
+]
