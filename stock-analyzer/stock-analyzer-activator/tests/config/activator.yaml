@@ -1,0 +1,12 @@
+base:
+  symbol: AAPL
+  input:
+    path: out.bin
+    dtype: float32
+    fetch_to_bin:
+      period: 7d
+      interval: 1h
+      field: Close
+
+cases:
+  - name: basic
