@@ -390,6 +390,7 @@ dependencies = [
     { name = "model" },
     { name = "parametrize-tests" },
     { name = "stock-analyzer" },
+    { name = "stock-analyzer-activator" },
     { name = "system" },
 ]
 
@@ -409,6 +410,7 @@ requires-dist = [
     { name = "model", editable = "model" },
     { name = "parametrize-tests", editable = "../signal-processing/parametrize-tests" },
     { name = "stock-analyzer", editable = "stock-analyzer" },
+    { name = "stock-analyzer-activator", editable = "stock-analyzer/stock-analyzer-activator" },
     { name = "system", editable = "../signal-processing/system" },
 ]
 
@@ -1476,6 +1478,32 @@ requires-dist = [
 dev = [
     { name = "parametrize-tests", editable = "../signal-processing/parametrize-tests" },
     { name = "pytest", specifier = ">=9.0.2" },
+]
+
+[[package]]
+name = "stock-analyzer-activator"
+version = "0.1.0"
+source = { editable = "stock-analyzer/stock-analyzer-activator" }
+dependencies = [
+    { name = "activator" },
+    { name = "data-fetcher" },
+    { name = "pyyaml" },
+    { name = "stock-analyzer" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "activator", editable = "../signal-processing/activator" },
+    { name = "data-fetcher", editable = "data-fetcher" },
+    { name = "pyyaml" },
+    { name = "stock-analyzer", editable = "stock-analyzer" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "parametrize-tests", editable = "../signal-processing/parametrize-tests" },
+    { name = "pytest", specifier = ">=9.0.2" },
+    { name = "pytest-mock" },
 ]
 
 [[package]]

@@ -1,0 +1,9 @@
+base:
+  symbol: AAPL
+  period: 7d
+  interval: 1h
+  field: Close
+  output_path: out.bin
+
+cases:
+  - name: basic
