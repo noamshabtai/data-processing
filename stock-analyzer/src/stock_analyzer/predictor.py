@@ -1,7 +1,8 @@
 import feature_extraction.feature_extraction
 import system.system
+import torch
 
-import model.trainer
+import model.model
 
 
 class System(system.system.System):
@@ -10,11 +11,14 @@ class System(system.system.System):
         self.modules["feature_extraction"] = feature_extraction.feature_extraction.FeatureExtraction(
             **kwargs["feature_extraction"]
         )
-        self.modules["trainer"] = model.trainer.Trainer(**kwargs["trainer"])
+        self.modules["model"] = model.model.Model(**kwargs["model"])
+        self.modules["model"].execute = self.modules["model"].forward
 
     def connect(self, module):
         match module:
             case "feature_extraction":
                 self.inputs[module] = {"data": self.input_buffer.buffer}
-            case "trainer":
-                self.inputs[module] = {"features": self.outputs["feature_extraction"]}
+            case "model":
+                self.inputs[module] = {
+                    "x": torch.from_numpy(self.outputs["feature_extraction"]).reshape(1, 1, -1).float()
+                }
