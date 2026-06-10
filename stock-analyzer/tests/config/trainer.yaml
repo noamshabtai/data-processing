@@ -1,0 +1,21 @@
+base:
+  trainer:
+    input_buffer:
+      channel_shape: []
+      step_size: 1
+      buffer_size: 50
+      dtype: float32
+    feature_extraction:
+      window_size: 20
+    trainer:
+      epochs: 1
+      learning_rate: 0.001
+      batch_size: 1
+      network:
+        input_dim: 6
+        hidden_dim: 32
+        output_dim: 1
+        num_layers: 2
+
+cases:
+  - name: basic
