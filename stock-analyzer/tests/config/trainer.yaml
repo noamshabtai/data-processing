@@ -1,5 +1,5 @@
 base:
-  system:
+  trainer:
     input_buffer:
       channel_shape: []
       step_size: 1
@@ -8,10 +8,9 @@ base:
     feature_extraction:
       window_size: 20
     trainer:
-      epochs: 3
+      epochs: 1
       learning_rate: 0.001
-      batch_size: 4
-      data_shuffle: true
+      batch_size: 1
       network:
         input_dim: 6
         hidden_dim: 32

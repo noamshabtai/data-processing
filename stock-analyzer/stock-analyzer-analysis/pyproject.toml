@@ -1,0 +1,27 @@
+[project]
+name = "stock-analyzer-analysis"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "analysis",
+    "stock-analyzer-activator",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/stock_analyzer_analysis"]
+
+[tool.uv.sources]
+analysis = { path = "../../../signal-processing/analysis", editable = true }
+stock-analyzer-activator = { path = "../stock-analyzer-activator", editable = true }
+parametrize-tests = { path = "../../../signal-processing/parametrize-tests", editable = true }
+
+[dependency-groups]
+dev = [
+    "parametrize-tests",
+    "pytest>=9.0.2",
+    "pytest-mock",
+]

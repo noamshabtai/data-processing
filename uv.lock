@@ -1459,6 +1459,7 @@ dependencies = [
     { name = "feature-extraction" },
     { name = "model" },
     { name = "system" },
+    { name = "torch" },
 ]
 
 [package.dev-dependencies]
@@ -1472,6 +1473,7 @@ requires-dist = [
     { name = "feature-extraction", editable = "feature-extraction" },
     { name = "model", editable = "model" },
     { name = "system", editable = "../signal-processing/system" },
+    { name = "torch" },
 ]
 
 [package.metadata.requires-dev]

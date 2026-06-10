@@ -6,6 +6,7 @@ dependencies = [
     "feature-extraction",
     "model",
     "system",
+    "torch",
 ]
 
 [build-system]

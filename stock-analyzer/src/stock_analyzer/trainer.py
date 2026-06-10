@@ -17,4 +17,4 @@ class System(system.system.System):
             case "feature_extraction":
                 self.inputs[module] = {"data": self.input_buffer.buffer}
             case "trainer":
-                self.inputs[module] = {"features": self.outputs["feature_extraction"]}
+                self.inputs[module] = {"features": self.outputs["feature_extraction"].reshape(1, -1).astype("float32")}

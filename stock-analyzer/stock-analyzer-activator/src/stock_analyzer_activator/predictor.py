@@ -1,5 +1,5 @@
 import activator.offline
-import stock_analyzer.system
+import stock_analyzer.predictor
 
 import stock_analyzer_activator.fetch_to_bin
 
@@ -8,7 +8,7 @@ class Activator(activator.offline.Activator):
     def __init__(self, **kwargs):
         self.symbol = kwargs["symbol"]
         self._prep_kwargs(kwargs)
-        super().__init__(stock_analyzer.system.System, **kwargs)
+        super().__init__(stock_analyzer.predictor.System, **kwargs)
 
     @classmethod
     def _prep_kwargs(cls, kwargs):
