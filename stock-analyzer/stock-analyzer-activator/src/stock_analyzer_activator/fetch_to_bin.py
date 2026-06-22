@@ -12,12 +12,3 @@ def fetch_to_bin(**kwargs):
     output_path = pathlib.Path(kwargs["output_path"])
     output_path.parent.mkdir(parents=True, exist_ok=True)
     values.tofile(output_path)
-
-
-if __name__ == "__main__":
-    import sys
-
-    import yaml
-
-    with open(sys.argv[1]) as f:
-        fetch_to_bin(**yaml.safe_load(f))
