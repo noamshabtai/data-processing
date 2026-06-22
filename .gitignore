@@ -4,3 +4,4 @@ outputs
 *egg-info
 *.wav
 *.swp
+*.bin

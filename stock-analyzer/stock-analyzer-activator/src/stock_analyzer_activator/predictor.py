@@ -19,7 +19,7 @@ class Activator(activator.offline.Activator):
             "symbol": kwargs["symbol"],
             "output_path": kwargs["input"]["path"],
         }
-        stock_analyzer_activator.fetch_to_bin.fetch_to_bin(fetch_cfg)
+        stock_analyzer_activator.fetch_to_bin.fetch_to_bin(**fetch_cfg)
 
     def post_figure_hook(self, plt, module, data):
         plt.title(f"{self.symbol} — {module}")
