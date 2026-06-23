@@ -11,7 +11,8 @@ description: Build, install, run, and code-style conventions for the data-proces
 - **Package manager:** uv
 - **Install:** `uv sync`
 - **Run tests:** `uv run pytest`
-- **Pre-commit:** `pre-commit run --all-files`
+- **Pre-commit:** `pre-commit run --all-files`. For how the `pytest` hook and CI
+  decide which tests run, see the `testing` skill.
 
 ## External dependency
 
