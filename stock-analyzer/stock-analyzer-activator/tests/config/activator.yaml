@@ -1,12 +1,13 @@
 base:
-  symbol: AAPL
   input:
     path: out.bin
     dtype: float32
     fetch_to_bin:
+      symbol: AAPL
       period: 7d
       interval: 1h
       field: Close
+  system: {}
 
 cases:
   - name: basic
