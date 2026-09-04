@@ -1,7 +1,7 @@
 import pathlib
 import sys
 
-import parametrize_tests.fixtures
+import parametrize_tests.kwargs
 
 tests_dir = pathlib.Path(__file__).parent / "tests"
 config_dir = tests_dir / "config"
@@ -10,6 +10,4 @@ for fixture in [
     "trainer",
     "model",
 ]:
-    parametrize_tests.fixtures.setattr_kwargs(fixture, config_dir, module)
-
-parametrize_tests.fixtures.setattr_project_dir(tests_dir, module)
+    parametrize_tests.kwargs.setattr_kwargs(fixture, config_dir, module)
