@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.14"
 resolution-markers = [
     "sys_platform == 'win32'",
@@ -18,49 +18,27 @@ name = "activator"
 version = "0.1.0"
 source = { editable = "../signal-processing/activator" }
 dependencies = [
-    { name = "audio-io" },
     { name = "matplotlib" },
-    { name = "pyaudio" },
     { name = "system" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "audio-io", editable = "../signal-processing/audio-io" },
+    { name = "audio-io", marker = "extra == 'audio'", editable = "../signal-processing/audio-io" },
     { name = "matplotlib", specifier = ">=3.10.0" },
-    { name = "pyaudio", specifier = ">=0.2.14" },
+    { name = "pyaudio", marker = "extra == 'audio'", specifier = ">=0.2.14" },
     { name = "system", editable = "../signal-processing/system" },
 ]
+provides-extras = ["audio"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "activator", extras = ["audio"] },
     { name = "io-for-tests", editable = "../signal-processing/io-for-tests" },
     { name = "parametrize-tests", editable = "../signal-processing/parametrize-tests" },
     { name = "pytest", specifier = ">=8.3.4" },
     { name = "pytest-mock", specifier = ">=3.14.0" },
     { name = "pytest-xdist", specifier = ">=3.6.1" },
-]
-
-[[package]]
-name = "audio-io"
-version = "0.1.0"
-source = { editable = "../signal-processing/audio-io" }
-dependencies = [
-    { name = "numpy" },
-    { name = "pyaudio" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "numpy", specifier = ">=2.2.3" },
-    { name = "pyaudio", specifier = ">=0.2.14" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "parametrize-tests", editable = "../signal-processing/parametrize-tests" },
-    { name = "pytest", specifier = ">=8.3.5" },
-    { name = "pytest-mock", specifier = ">=3.14.0" },
 ]
 
 [[package]]
@@ -920,12 +898,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/9b/53/a9443aa3ca9ba8724fdfa02dd1887c1bcd8e89556b715cfbacca6b63dbec/protobuf-6.33.5-cp39-abi3-manylinux2014_x86_64.whl", hash = "sha256:cbf16ba3350fb7b889fca858fb215967792dc125b35c7976ca4818bee3521cf0", size = 323465, upload-time = "2026-01-29T21:51:28.925Z" },
     { url = "https://files.pythonhosted.org/packages/57/bf/2086963c69bdac3d7cff1cc7ff79b8ce5ea0bec6797a017e1be338a46248/protobuf-6.33.5-py3-none-any.whl", hash = "sha256:69915a973dd0f60f31a08b8318b73eab2bd6a392c79184b3612226b0a3f8ec02", size = 170687, upload-time = "2026-01-29T21:51:32.557Z" },
 ]
-
-[[package]]
-name = "pyaudio"
-version = "0.2.14"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/26/1d/8878c7752febb0f6716a7e1a52cb92ac98871c5aa522cba181878091607c/PyAudio-0.2.14.tar.gz", hash = "sha256:78dfff3879b4994d1f4fc6485646a57755c6ee3c19647a491f790a0895bd2f87", size = 47066, upload-time = "2023-11-07T07:11:48.806Z" }
 
 [[package]]
 name = "pycparser"
