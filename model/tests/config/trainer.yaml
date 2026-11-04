@@ -11,13 +11,7 @@ base:
       input_dim: 6
       hidden_dim: 32
       output_dim: 1
+      num_layers: 2
 
 cases:
-  - name: num_layers_1
-    model:
-      network:
-        num_layers: 1
-  - name: num_layers_2
-    model:
-      network:
-        num_layers: 2
+  - name: default

@@ -20,14 +20,14 @@ them, but wait for the go-ahead. (Build/install/run and lint commands live in th
 - YAML configs support:
   - `sweep` — cartesian product of parameter values.
   - `base` — inherited defaults.
-- All modules follow the same `conftest.py` pattern using
-  `parametrize_tests.fixtures`.
+- Each `test_<function>` takes `kwargs_<module>`, a single case from
+  `<module>.yaml`, unless its checks depend on a varied setting; then it takes
+  `kwargs_<module>_<function>` from `<module>_<function>.yaml`.
 
 ## conftest pattern
 
-- `conftest.py` registers YAML-based parametrized fixtures via
-  `parametrize_tests.fixtures.setattr_kwargs`.
-- Deep copy of kwargs in tests ensures isolation between parametrized cases.
+- `conftest.py` registers each YAML file as a fixture via
+  `parametrize_tests.kwargs.setattr_kwargs`.
 
 ## Mocking external / network calls
 
