@@ -1,0 +1,23 @@
+base:
+  feature_extraction:
+    window_size: 20
+
+cases:
+  - name: constant
+    simulation:
+      type: constant
+      value: 5.0
+      size: 100
+
+  - name: linear
+    simulation:
+      type: linear
+      start: 0
+      stop: 10
+      size: 100
+
+  - name: sine
+    simulation:
+      type: sine
+      cycles: 5
+      size: 100

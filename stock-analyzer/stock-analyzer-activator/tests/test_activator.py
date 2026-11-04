@@ -4,8 +4,7 @@ import stock_analyzer.predictor
 import stock_analyzer_activator.activator
 
 
-def test_activator_fetches_to_bin(mocker, kwargs_activator):
-    kwargs = copy.deepcopy(kwargs_activator)
+def check_fetches(mocker, kwargs):
     mock_base_init = mocker.patch("activator.offline.Activator.__init__", return_value=None)
     mock_fetch = mocker.patch("stock_analyzer_activator.fetch_to_bin.fetch_to_bin")
 
@@ -19,8 +18,7 @@ def test_activator_fetches_to_bin(mocker, kwargs_activator):
     mock_base_init.assert_called_once_with(stock_analyzer.predictor.System, **kwargs["system"])
 
 
-def test_activator_skips_fetch_when_unconfigured(mocker, kwargs_activator):
-    kwargs = copy.deepcopy(kwargs_activator)
+def check_skips_fetch(mocker, kwargs):
     del kwargs["input"]["fetch_to_bin"]
     mocker.patch("activator.offline.Activator.__init__", return_value=None)
     mock_fetch = mocker.patch("stock_analyzer_activator.fetch_to_bin.fetch_to_bin")
@@ -29,3 +27,8 @@ def test_activator_skips_fetch_when_unconfigured(mocker, kwargs_activator):
 
     mock_fetch.assert_not_called()
     assert activator.symbol is None
+
+
+def test_init(mocker, kwargs_activator):
+    check_fetches(mocker, copy.deepcopy(kwargs_activator))
+    check_skips_fetch(mocker, copy.deepcopy(kwargs_activator))
